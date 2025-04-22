@@ -1,3 +1,4 @@
+require('dotenv').config(); // dotenvを使用して環境変数を読み込む
 const { RingApi } = require('ring-client-api')
 const Drive = require('@googleapis/drive')
 const path = require('path')
