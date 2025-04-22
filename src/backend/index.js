@@ -6,6 +6,7 @@ const { CameraHandle } = require('./camera.js')
 const { getDate } = require('./utils.js')
 const { backup } = require('./backup.js')
 const { CronJob } = require('cron')
+const fs = require('fs').promises; // ファイル操作用
 
 const start = async () => {
     // RingAPIの初期化
@@ -13,7 +14,20 @@ const start = async () => {
         refreshToken: process.env.RING_REFRESH_TOKEN,
         cameraStatusPollingSeconds: 20,
         controlCenterDisplayName: 'RingBypassClient'
-    })
+    });
+
+    // トークン更新時の処理
+    ring.onRefreshTokenUpdated.subscribe(async ({ newRefreshToken }) => {
+        console.log('Refresh token updated.');
+        const envPath = path.join(__dirname, '../../.env');
+        const envContent = await fs.readFile(envPath, 'utf8');
+        const updatedEnvContent = envContent.replace(
+            /RING_REFRESH_TOKEN=.*/,
+            `RING_REFRESH_TOKEN=${newRefreshToken}`
+        );
+        await fs.writeFile(envPath, updatedEnvContent);
+        console.log('.env file updated with new refresh token.');
+    });
 
     // カメラへの接続
     const cameras = await ring.getCameras()
