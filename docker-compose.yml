@@ -1,0 +1,39 @@
+services:
+  # Backendサービス
+  server:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - .:/app
+      - output:/app/output # 共通の出力ディレクトリ
+      - node-modules:/app/node_modules # node_modulesのボリューム
+      # - ./src/backend:/app/src/backend # Backendソースコードのマウント
+    env_file:
+      - .env # 環境変数ファイル
+    restart: always # サービスが停止した場合に自動再起動
+    command: yarn server # サーバー起動コマンド
+
+  # Frontendサービス
+  web:
+    depends_on:
+      - server # serverサービスが起動していることを前提
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - .:/app
+      - output:/app/output # 共通の出力ディレクトリ
+      - node-modules:/app/node_modules # node_modulesのボリューム
+      # - ./src/frontend:/app/src/frontend # Frontendソースコードのマウント
+      # - ./public:/app/public # 公開ディレクトリのマウント
+    ports:
+      - 8080:8080 # ホストとコンテナのポートマッピング
+    environment:
+      - TZ=Asia/Tokyo # タイムゾーン設定
+    restart: always # サービスが停止した場合に自動再起動
+    command: yarn web # フロントエンド起動コマンド
+
+volumes:
+  output: # 共通の出力ボリューム
+  node-modules:

@@ -1,0 +1,27 @@
+// See https://containers.dev/implementors/json_reference/ for configuration reference
+{
+	"name": "Ring Client App",
+	"service": "web",
+	"workspaceFolder": "/app",
+	"dockerComposeFile": [
+		"../docker-compose.yml",
+		"../docker-compose.dev.yml"
+	],
+	// "remoteUser": "node",
+	"runServices": [
+		"web",
+		"server"
+	], // 起動するサービスを指定
+	"shutdownAction": "stopCompose",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"github.copilot",
+				"github.copilot-chat"
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "bash"
+			}
+		}
+	}
+}
