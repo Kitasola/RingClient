@@ -24,6 +24,29 @@ window.addEventListener('load', async () => {
     const output_sprite = new PIXI.Sprite(output_textures[output_textures_id])
     app.stage.addChild(output_sprite)
 
+    // 動画用UIの配置
+    const playButton = new PIXI.Text('▶', {
+        fontSize: 48,
+        fill: 'white',
+        align: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    });
+    playButton.anchor = 0.5;
+    playButton.x = app.screen.width / 2;
+    playButton.y = app.screen.height / 2;
+    playButton.interactive = true;
+    playButton.buttonMode = true;
+    playButton.visible = false; // 初期状態は非表示
+    app.stage.addChild(playButton);
+
+    // 再生ボタンのクリックイベント
+    playButton.on('pointertap', () => {
+        output_sprite.texture.source.resource.muted = false;
+        output_sprite.texture.source.resource.play()
+            .catch(err => console.log('Audio playback failed:', err));
+        playButton.visible = false; // 再生後にボタンを非表示
+    });
+
     // 参照アセットの変更関数
     const changeAsset = async (id) => {
         // アセットが動画の場合
@@ -32,6 +55,8 @@ window.addEventListener('load', async () => {
             output_sprite.texture.source.resource.currentTime = 0
             output_sprite.texture.source.resource.muted = true
             output_sprite.texture.source.resource.pause()
+            // 動画用UIの非表示
+            playButton.visible = false;
         }
 
         // アセットのスワップ
@@ -51,10 +76,10 @@ window.addEventListener('load', async () => {
         if (output_sprite.texture.source.uploadMethodId === 'video') {
             // 再生位置を0sに変更
             output_sprite.texture.source.resource.currentTime = 0
-            // 自動再生と音声を有効化
-            output_sprite.texture.source.resource.muted = false
-            output_sprite.texture.source.resource.play()
-                .catch(err => { })
+
+            output_sprite.texture.source.resource.muted = true;
+            output_sprite.texture.source.resource.playsInline = true;
+            output_sprite.texture.source.resource.pause()
 
             // 再生中の処理
             output_sprite.texture.source.resource.addEventListener('timeupdate', () => {
@@ -69,6 +94,11 @@ window.addEventListener('load', async () => {
                     }
                 }
             })
+
+            // 動画用UIの表示
+            if (output_sprite.texture.source.uploadMethodId === 'video') {
+                playButton.visible = true;
+            }
         }
     }
 
@@ -91,13 +121,12 @@ window.addEventListener('load', async () => {
                 if (Math.abs(swipe_distance) > 50) {
                     if (swipe_distance > 0) {
                         // 右スワイプの場合は前のアセットに変更
-                        await changeAsset(output_textures_id - 1)
+                        await changeAsset(output_textures_id + 1)
                     } else {
                         // 左スワイプの場合は次のアセットに変更
-                        await changeAsset(output_textures_id + 1)
+                        await changeAsset(output_textures_id - 1)
                     }
                 }
-
             })
         })
     } else {
