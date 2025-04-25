@@ -43,6 +43,22 @@ window.addEventListener('load', async () => {
         output_sprite.texture.source.resource.pause()
     })
 
+    // 5sスキップの処理
+    video_ui.skip(() => {
+        output_sprite.texture.source.resource.currentTime += 5;
+        if (output_sprite.texture.source.resource.currentTime >= output_sprite.texture.source.resource.duration) {
+            output_sprite.texture.source.resource.currentTime = output_sprite.texture.source.resource.duration
+        }
+    })
+
+    //5s巻き戻しの処理
+    video_ui.rewind(() => {
+        output_sprite.texture.source.resource.currentTime -= 5;
+        if (output_sprite.texture.source.resource.currentTime < 0) {
+            output_sprite.texture.source.resource.currentTime = 0
+        }
+    });
+
     // 参照アセットの変更関数
     const changeAsset = async (id) => {
         // アセットが動画の場合
@@ -80,12 +96,11 @@ window.addEventListener('load', async () => {
                 if (output_sprite.texture.source.uploadMethodId === 'video') {
                     // 再生終了時に次のアセットに変更
                     if (output_sprite.texture.source.resource.currentTime >= output_sprite.texture.source.resource.duration) {
-                        changeAsset(output_textures_id + 1)
+                        // changeAsset(output_textures_id - 1)
+                        output_sprite.texture.source.resource.pause()
                     }
-                    else {
-                        // キャプションに再生位置を追加
-                        caption_date.textContent = texture_date.toLocaleString() + ' + ' + output_sprite.texture.source.resource.currentTime.toFixed() + 's'
-                    }
+                    // キャプションに再生位置を追加
+                    caption_date.textContent = texture_date.toLocaleString() + ' + ' + output_sprite.texture.source.resource.currentTime.toFixed() + 's'
                 }
             })
 

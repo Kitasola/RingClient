@@ -5,14 +5,20 @@ export class VideoUI {
         this.group = new PIXI.Container();
         this.group.name = 'video-ui';
         this.group.x = this.app.screen.width / 2;
-        this.group.y = this.app.screen.height / 2;
+        this.group.y = this.app.screen.height - 58;
         this.app.stage.addChild(this.group);
 
-        // ボタンの初期化
+        // ボタン
         this.playButton = null;
         this.pauseButton = null;
+        this.skipButton = null;
+        this.rewindButton = null;
+
+        // 操作対象の動画
         this.playFunction = null;
         this.pauseFunction = null;
+        this.skipFunction = null;
+        this.rewindFunction = null;
     }
 
     // UIの初期化
@@ -45,6 +51,32 @@ export class VideoUI {
         });
         this.group.addChild(this.pauseButton);
 
+        // 5sスキップボタン
+        const skipButtonTexture = await PIXI.Assets.load('/image/video-ui/skip.png');
+        this.skipButton = new PIXI.Sprite(skipButtonTexture);
+        this.skipButton.anchor.set(0.5);
+        this.skipButton.x = this.playButton.width + 10;
+        this.skipButton.interactive = true;
+        this.skipButton.buttonMode = true;
+        // クリックイベント
+        this.skipButton.on('pointertap', () => {
+            this.skipFunction();
+        });
+        this.group.addChild(this.skipButton);
+
+        // 5s巻き戻しボタン
+        const rewindButtonTexture = await PIXI.Assets.load('/image/video-ui/rewind.png');
+        this.rewindButton = new PIXI.Sprite(rewindButtonTexture);
+        this.rewindButton.anchor.set(0.5);
+        this.rewindButton.x = -(this.playButton.width + 10);
+        this.rewindButton.interactive = true;
+        this.rewindButton.buttonMode = true;
+        // クリックイベント
+        this.rewindButton.on('pointertap', () => {
+            this.rewindFunction();
+        });
+        this.group.addChild(this.rewindButton);
+
         // ボタンの初期表示
         this.visible(true);
     }
@@ -66,12 +98,11 @@ export class VideoUI {
         this.pauseFunction = func;
     }
 
-    stop() {
-
+    skip(func) {
+        this.skipFunction = func;
     }
 
-    next() {
-
+    rewind(func) {
+        this.rewindFunction = func;
     }
 }
-
