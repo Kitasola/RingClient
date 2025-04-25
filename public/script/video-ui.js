@@ -29,6 +29,7 @@ export class VideoUI {
         this.playButton.anchor.set(0.5);
         this.playButton.interactive = true;
         this.playButton.buttonMode = true;
+        this.playButton.tint = 0x000000; // 黒色
         // クリックイベント
         this.playButton.on('pointertap', () => {
             this.playFunction();
@@ -43,6 +44,7 @@ export class VideoUI {
         this.pauseButton.anchor.set(0.5);
         this.pauseButton.interactive = true;
         this.pauseButton.buttonMode = true;
+        this.pauseButton.tint = 0x000000; // 黒色
         // クリックイベント
         this.pauseButton.on('pointertap', () => {
             this.pauseFunction();
@@ -58,6 +60,7 @@ export class VideoUI {
         this.skipButton.x = this.playButton.width + 10;
         this.skipButton.interactive = true;
         this.skipButton.buttonMode = true;
+        this.skipButton.tint = 0x000000; // 黒色
         // クリックイベント
         this.skipButton.on('pointertap', () => {
             this.skipFunction();
@@ -71,6 +74,7 @@ export class VideoUI {
         this.rewindButton.x = -(this.playButton.width + 10);
         this.rewindButton.interactive = true;
         this.rewindButton.buttonMode = true;
+        this.rewindButton.tint = 0x000000; // 黒色
         // クリックイベント
         this.rewindButton.on('pointertap', () => {
             this.rewindFunction();
