@@ -1,3 +1,5 @@
+import { VideoUI } from './video-ui.js'
+
 window.addEventListener('load', async () => {
     // キャンバスの生成
     const app = new PIXI.Application()
@@ -24,28 +26,22 @@ window.addEventListener('load', async () => {
     const output_sprite = new PIXI.Sprite(output_textures[output_textures_id])
     app.stage.addChild(output_sprite)
 
-    // 動画用UIの配置
-    const playButton = new PIXI.Text('▶', {
-        fontSize: 48,
-        fill: 'white',
-        align: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    });
-    playButton.anchor = 0.5;
-    playButton.x = app.screen.width / 2;
-    playButton.y = app.screen.height / 2;
-    playButton.interactive = true;
-    playButton.buttonMode = true;
-    playButton.visible = false; // 初期状態は非表示
-    app.stage.addChild(playButton);
+    // 動画UIの作成
+    const video_ui = new VideoUI(app)
+    await video_ui.init()
 
-    // 再生ボタンのクリックイベント
-    playButton.on('pointertap', () => {
+    // 再生時の処理
+    video_ui.play(() => {
         output_sprite.texture.source.resource.muted = false;
         output_sprite.texture.source.resource.play()
             .catch(err => console.log('Audio playback failed:', err));
-        playButton.visible = false; // 再生後にボタンを非表示
-    });
+    })
+
+    // 一時停止時の処理
+    video_ui.pause(() => {
+        output_sprite.texture.source.resource.muted = true;
+        output_sprite.texture.source.resource.pause()
+    })
 
     // 参照アセットの変更関数
     const changeAsset = async (id) => {
@@ -55,8 +51,6 @@ window.addEventListener('load', async () => {
             output_sprite.texture.source.resource.currentTime = 0
             output_sprite.texture.source.resource.muted = true
             output_sprite.texture.source.resource.pause()
-            // 動画用UIの非表示
-            playButton.visible = false;
         }
 
         // アセットのスワップ
@@ -96,9 +90,11 @@ window.addEventListener('load', async () => {
             })
 
             // 動画用UIの表示
-            if (output_sprite.texture.source.uploadMethodId === 'video') {
-                playButton.visible = true;
-            }
+            video_ui.visible(true);
+        }
+        else {
+            // 動画でない場合はUIを非表示
+            video_ui.visible(false);
         }
     }
 
